@@ -12,6 +12,17 @@ npm install os
 # install node modules for frontend
 npm install xterm
 
+# Attaches to a server running a process via a websocket
+npm i xterm-addon-attach
+
+# Fits the terminal to the containing element
+npm i xterm-addon-fit
+
+# Adds search functionality
+npm i xterm-addon-search
+
+# Adds web link detection and interaction
+npm i xterm-addon-web-links
 
 # run backend Web Socket server @ Linux/Windows
 
