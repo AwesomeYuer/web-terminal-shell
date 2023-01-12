@@ -1,52 +1,35 @@
-const express = require("express");
-const expressWs = require("express-ws");
+var express = require('express');
+var app = express();
 const pty = require("node-pty");
+require('express-ws')(app);
 const os = require("os");
-
-const shell = os.platform() === "win32" ? "powershell.exe" : "bash";
-const app = express();
-expressWs(app);
-const termMap = new Map();
-function nodeEnvBind() {
-  //绑定当前系统 node 环境
-  const term = pty.spawn(shell, ["--login"], {
-    name: "xterm-color",
-    cols: 80,
+const platform = os.platform();
+const shell = platform === "win32" ? "powershell.exe" : "bash";
+const args = platform === "win32" ? "" : "--login";
+app.ws("/socket", (ws, req) => {
+  console.log('websocket连接成功了')
+  // 每次连接的时候都要生成一次term。否则在客服端刷新页面时，服务端的term就会失去连接
+  // 虚拟终端（接收和转换输入）
+  const term = pty.spawn(shell, [args], {
+    name: "xterm",
+    cols: 50,
     rows: 24,
     cwd: process.env.HOME,
     env: process.env,
   });
-  termMap.set(term.pid, term);
-  return term;
-}
-//解决跨域问题
-app.all("*", function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  res.header("Access-Control-Allow-Methods", "*");
-  next();
-});
-//服务端初始化
-app.post("/terminal", (req, res) => {
-  const term = nodeEnvBind(req);
-  res.send(term.pid.toString());
-  res.end();
-});
-
-app.ws("/socket/:pid", (ws, req) => {
-  const pid = parseInt(req.params.pid);
-  const term = termMap.get(pid);
+  ws.on("open", (data) => {
+    console.log('open data===', data)
+  });
   term.on("data", function (data) {
+    console.log('发送给客服端的数据===', data)
     ws.send(data);
   });
-
   ws.on("message", (data) => {
-    console.log(typeof data === "string");
+    console.log('接收客服端的数据===', data)
     term.write(data);
   });
   ws.on("close", function () {
     term.kill();
-    termMap.delete(pid);
   });
 });
-app.listen(4000, "127.0.0.1");
+app.listen(8020);
