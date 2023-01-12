@@ -12,7 +12,10 @@
   <div id="terminal-container" style="height: 900px; width: 80%;"></div>
   <script>
     
-    const terminal = new Terminal();
+    const terminal = new Terminal({
+       cols: 100,
+       rows: 40, //行数
+     });
     const fitAddon = new FitAddon.FitAddon();
     terminal.loadAddon(fitAddon);
 

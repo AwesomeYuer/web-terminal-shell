@@ -12,8 +12,8 @@ app.ws("/socket", (ws, req) => {
   // 虚拟终端（接收和转换输入）
   const term = pty.spawn(shell, [args], {
     name: "xterm",
-    cols: 50,
-    rows: 24,
+    cols: 100,
+    rows: 100,
     cwd: process.env.HOME,
     env: process.env,
   });
