@@ -1,3 +1,6 @@
+Run on linux/Termux OK
+
+
 ```shell
 # install node modules for backend
 npm install express
