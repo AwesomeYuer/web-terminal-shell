@@ -6,6 +6,15 @@ const os = require("os");
 const platform = os.platform();
 const shell = platform === "win32" ? "powershell.exe" : "bash";
 const args = platform === "win32" ? "" : "--login";
+
+//解决跨域问题
+app.all("*", function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Methods", "*");
+  next();
+});
+
 app.ws("/socket", (ws, req) => {
   console.log('websocket连接成功了')
   // 每次连接的时候都要生成一次term。否则在客服端刷新页面时，服务端的term就会失去连接
